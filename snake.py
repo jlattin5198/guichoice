@@ -19,7 +19,7 @@ class Game:
         upper_scr.pack()
         lower.pack()
 
-        title = t.Label(upper, text="Snake - Use arrow keys")
+        title = t.Label(upper, text="Snake - Use arrow keys or WASD")
         title.pack()
 
         s_btn = t.Button(upper_btn, text="Start")
@@ -38,24 +38,39 @@ class Game:
         self.gamewin.bind("<Right>", self.slither)
         self.gamewin.bind("<Up>", self.slither)
         self.gamewin.bind("<Down>", self.slither)
+        self.gamewin.bind("w", self.slither)
+        self.gamewin.bind("a", self.slither)
+        self.gamewin.bind("s", self.slither)
+        self.gamewin.bind("d", self.slither)
 
         self.snake = self.gamewin.create_rectangle(172, 172, 192, 192, tags="hiss", fill="blue")
 
-        self.dot = self.gamewin.create_rectangle(177, 177, 187, 187)
+        self.dot = self.gamewin.create_rectangle(177, 177, 187, 187, fill="red")
+        self.bb = self.gamewin.bbox(self.dot)
 
     def slither(self, event):
         dir = str(event.keysym)
         dx = 0
         dy = 0
-        if dir == "Left":
+        if dir == "Left" or "a":
             dx = -20
-        elif dir == "Right":
+        elif dir == "Right" or "d":
             dx = 20
-        elif dir == "Up":
+        elif dir == "Up" or "w":
             dy = -20
-        else:
+        elif dir == "Down" or "s":
             dy = 20
         self.gamewin.move(self.snake, dx, dy)
+        if self.gamewin.find_overlapping(self.bb[0], self.bb[1], self.bb[2], self.bb[3]) == (1, 2):
+            self.scatter()
+            self.score = self.score + 1
+            self.scr_lab["text"] = "Score: " + str(self.score)
 
+    def scatter(self):
+        loc = self.gamewin.coords(self.dot)
+        newx = r.randint(10, 340)
+        newy = r.randint(10, 340)
+        self.gamewin.move(self.dot)
+        print(self.gamewin.coords(self.dot))
 
 main()
