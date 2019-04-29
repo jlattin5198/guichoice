@@ -1,5 +1,4 @@
 import tkinter as t
-import time
 import random as r
 
 
@@ -12,17 +11,21 @@ def main():
 class Game:
     def __init__(self, parent):
         """creates snake window and components"""
+        self.parent = parent
+
         upper = t.Frame(parent)
         upper_btn = t.Frame(parent)
         upper_scr = t.Frame(parent)
         lower = t.Frame(parent)
+        lower_set = t.Frame(parent)
         upper.pack()
         upper_btn.pack()
         upper_scr.pack()
         lower.pack()
+        lower_set.pack()
 
-        title = t.Label(upper, text="Snake - Use arrow keys or WASD")
-        title.pack()
+        self.title = t.Label(upper, text="Snake")
+        self.title.pack()
 
         self.s_btn = t.Button(upper_btn, text="Start")
         self.s_btn.pack(side="left")
@@ -46,6 +49,10 @@ class Game:
         self.gamewin.bind("a", self.slither)
         self.gamewin.bind("s", self.slither)
         self.gamewin.bind("d", self.slither)
+        self.gamewin.bind("i", self.slither)
+        self.gamewin.bind("j", self.slither)
+        self.gamewin.bind("k", self.slither)
+        self.gamewin.bind("l", self.slither)
         self.status = False
 
         self.snake = self.gamewin.create_rectangle(172, 172, 192, 192, tags="hiss", fill="blue")
@@ -55,6 +62,25 @@ class Game:
         self.scatter()
 
         self.ded = self.gamewin.create_text(182, 182, text="You died!", justify="center", font=("Arial", 30), state="hidden")
+
+        self.cs_var = t.StringVar(parent)
+        self.cs_var.set("color scheme")
+        self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale")
+        self.colorset.pack(side="left")
+
+        self.kb_var = t.StringVar(parent)
+        self.kb_var.set("key bindings")
+        self.ctrlset = t.OptionMenu(lower_set, self.kb_var, "key bindings", "wasd", "arrow keys", "ijkl")
+        self.ctrlset.pack(side="right")
+
+        self.apply = t.Button(lower_set, text="Apply")
+        self.apply.pack(side="right")
+        self.apply.bind("<ButtonRelease-1>", self.settings)
+
+        self.colorscheme = {
+            "normal": ["SystemButtonFace", "white", "SystemButtonText", "SystemButtonFace", "blue", "red", "SystemWindowFrame", "SystemDisabledText"],
+            "neon blue": ["black", "black", "deep sky blue", "gray15", "deep sky blue", "OrangeRed2", "deep sky blue", "white"]
+        }
 
     def slither(self, event):
         """moves the snake on user input"""
@@ -102,6 +128,44 @@ class Game:
         self.scatter()
         self.status = True
         self.gamewin.itemconfig(self.ded, state="hidden")
+
+    def colorize(self, opt):
+        if not opt == "color scheme":
+            self.parent["bg"] = self.colorscheme[opt][0]
+            self.title["bg"] = self.colorscheme[opt][0]
+            self.title["foreground"] = self.colorscheme[opt][2]
+            self.s_btn["bg"] = self.colorscheme[opt][3]
+            self.s_btn["activebackground"] = self.colorscheme[opt][3]
+            self.s_btn["foreground"] = self.colorscheme[opt][2]
+            self.s_btn["disabledforeground"] = self.colorscheme[opt][7]
+            self.r_btn["bg"] = self.colorscheme[opt][3]
+            self.r_btn["activebackground"] = self.colorscheme[opt][3]
+            self.r_btn["foreground"] = self.colorscheme[opt][2]
+            self.r_btn["disabledforeground"] = self.colorscheme[opt][7]
+            self.scr_lab["bg"] = self.colorscheme[opt][0]
+            self.scr_lab["foreground"] = self.colorscheme[opt][2]
+            self.colorset["bg"] = self.colorscheme[opt][0]
+            self.colorset["activebackground"] = self.colorscheme[opt][0]
+            self.colorset["fg"] = self.colorscheme[opt][2]
+            self.colorset["activeforeground"] = self.colorscheme[opt][2]
+            self.ctrlset["bg"] = self.colorscheme[opt][0]
+            self.ctrlset["activebackground"] = self.colorscheme[opt][0]
+            self.ctrlset["fg"] = self.colorscheme[opt][2]
+            self.ctrlset["activeforeground"] = self.colorscheme[opt][2]
+            self.apply["bg"] = self.colorscheme[opt][3]
+            self.apply["activebackground"] = self.colorscheme[opt][3]
+            self.apply["foreground"] = self.colorscheme[opt][2]
+            self.gamewin["bg"] = self.colorscheme[opt][1]
+            self.gamewin["highlightcolor"] = self.colorscheme[opt][6]
+            self.gamewin.itemconfig(self.snake, fill=self.colorscheme[opt][4])
+            self.gamewin.itemconfig(self.dot, fill=self.colorscheme[opt][5])
+
+    def rebind(self, opt):
+        c = opt
+
+    def settings(self, event):
+        self.colorize(self.cs_var.get())
+        self.rebind(self.kb_var.get())
 
 
 main()
