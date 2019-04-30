@@ -66,20 +66,23 @@ class Game:
         self.cs_var = t.StringVar(parent)
         self.cs_var.set("color scheme")
         self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale")
+        self.colorset["highlightthickness"] = 0
         self.colorset.pack(side="left")
 
         self.kb_var = t.StringVar(parent)
         self.kb_var.set("key bindings")
         self.ctrlset = t.OptionMenu(lower_set, self.kb_var, "key bindings", "wasd", "arrow keys", "ijkl")
+        self.ctrlset["highlightthickness"] = 0
         self.ctrlset.pack(side="right")
 
         self.apply = t.Button(lower_set, text="Apply")
-        self.apply.pack(side="right")
+        self.apply.pack(side="right", fill="y")
         self.apply.bind("<ButtonRelease-1>", self.settings)
 
         self.colorscheme = {
             "normal": ["SystemButtonFace", "white", "SystemButtonText", "SystemButtonFace", "blue", "red", "SystemWindowFrame", "SystemDisabledText"],
-            "neon blue": ["black", "black", "deep sky blue", "gray15", "deep sky blue", "OrangeRed2", "deep sky blue", "white"]
+            "neon blue": ["black", "black", "deep sky blue", "gray15", "deep sky blue", "OrangeRed2", "deep sky blue", "white"],
+            "neon yellow": ["black", "black", "yellow2", "gray15", "yellow2", "OrangeRed2", "yellow2", "white"]
         }
 
     def slither(self, event):
@@ -144,12 +147,12 @@ class Game:
             self.r_btn["disabledforeground"] = self.colorscheme[opt][7]
             self.scr_lab["bg"] = self.colorscheme[opt][0]
             self.scr_lab["foreground"] = self.colorscheme[opt][2]
-            self.colorset["bg"] = self.colorscheme[opt][0]
-            self.colorset["activebackground"] = self.colorscheme[opt][0]
+            self.colorset["bg"] = self.colorscheme[opt][3]
+            self.colorset["activebackground"] = self.colorscheme[opt][3]
             self.colorset["fg"] = self.colorscheme[opt][2]
             self.colorset["activeforeground"] = self.colorscheme[opt][2]
-            self.ctrlset["bg"] = self.colorscheme[opt][0]
-            self.ctrlset["activebackground"] = self.colorscheme[opt][0]
+            self.ctrlset["bg"] = self.colorscheme[opt][3]
+            self.ctrlset["activebackground"] = self.colorscheme[opt][3]
             self.ctrlset["fg"] = self.colorscheme[opt][2]
             self.ctrlset["activeforeground"] = self.colorscheme[opt][2]
             self.apply["bg"] = self.colorscheme[opt][3]
@@ -159,6 +162,7 @@ class Game:
             self.gamewin["highlightcolor"] = self.colorscheme[opt][6]
             self.gamewin.itemconfig(self.snake, fill=self.colorscheme[opt][4])
             self.gamewin.itemconfig(self.dot, fill=self.colorscheme[opt][5])
+            self.gamewin.itemconfig(self.ded, fill=self.colorscheme[opt][2])
 
     def rebind(self, opt):
         c = opt
