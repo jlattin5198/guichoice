@@ -24,7 +24,7 @@ class Game:
         lower.pack()
         lower_set.pack()
 
-        self.title = t.Label(upper, text="Snake")
+        self.title = t.Label(upper, text="Snake - Use wasd to control")
         self.title.pack()
 
         self.s_btn = t.Button(upper_btn, text="Start")
@@ -65,7 +65,7 @@ class Game:
 
         self.cs_var = t.StringVar(parent)
         self.cs_var.set("color scheme")
-        self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale")
+        self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale", "sky")
         self.colorset["highlightthickness"] = 0
         self.colorset.pack(side="left")
 
@@ -82,8 +82,21 @@ class Game:
         self.colorscheme = {
             "normal": ["SystemButtonFace", "white", "SystemButtonText", "SystemButtonFace", "blue", "red", "SystemWindowFrame", "SystemDisabledText"],
             "neon blue": ["black", "black", "deep sky blue", "gray15", "deep sky blue", "OrangeRed2", "deep sky blue", "white"],
-            "neon yellow": ["black", "black", "yellow2", "gray15", "yellow2", "OrangeRed2", "yellow2", "white"]
+            "neon yellow": ["black", "black", "yellow2", "gray15", "yellow2", "OrangeRed2", "yellow2", "white"],
+            "grayscale": ["gray50", "gray60", "black", "gray30", "dark slate gray", "black", "dark slate gray", "gray"],
+            "sky": ["sky blue", "light sky blue", "yellow", "gray85", "gold", "snow", "snow", "gray70"],
+            "ocean": []
         }
+
+        self.keybind = {
+            "wasd": ["w", "a", "s", "d"],
+            "arrow keys": ["Up", "Left", "Down", "Right"],
+            "ijkl": ["i", "j", "k", "l"]
+        }
+        self.u = "w"
+        self.l = "a"
+        self.d = "s"
+        self.r = "d"
 
     def slither(self, event):
         """moves the snake on user input"""
@@ -91,13 +104,13 @@ class Game:
             dir = str(event.keysym)
             dx = 0
             dy = 0
-            if dir == "Left" or dir == "a":
+            if dir == self.l:
                 dx = -20
-            elif dir == "Right" or dir == "d":
+            elif dir == self.r:
                 dx = 20
-            elif dir == "Up" or dir == "w":
+            elif dir == self.u:
                 dy = -20
-            elif dir == "Down" or dir == "s":
+            elif dir == self.d:
                 dy = 20
             self.gamewin.move(self.snake, dx, dy)
             loc = self.gamewin.coords(self.snake)
@@ -124,15 +137,17 @@ class Game:
 
     def retry(self, event):
         """resets the game"""
-        self.score = 0
-        self.scr_lab["text"] = "Score: 0"
-        loc = self.gamewin.coords(self.snake)
-        self.gamewin.move(self.snake, 172 - loc[0], 172 - loc[1])
-        self.scatter()
-        self.status = True
-        self.gamewin.itemconfig(self.ded, state="hidden")
+        if not self.r_btn["state"] == "disabled":
+            self.score = 0
+            self.scr_lab["text"] = "Score: 0"
+            loc = self.gamewin.coords(self.snake)
+            self.gamewin.move(self.snake, 172 - loc[0], 172 - loc[1])
+            self.scatter()
+            self.status = True
+            self.gamewin.itemconfig(self.ded, state="hidden")
 
     def colorize(self, opt):
+        """changes game window color scheme"""
         if not opt == "color scheme":
             self.parent["bg"] = self.colorscheme[opt][0]
             self.title["bg"] = self.colorscheme[opt][0]
@@ -165,9 +180,16 @@ class Game:
             self.gamewin.itemconfig(self.ded, fill=self.colorscheme[opt][2])
 
     def rebind(self, opt):
-        c = opt
+        """changes movement key bindings"""
+        if not opt == "key bindings":
+            self.u = self.keybind[opt][0]
+            self.l = self.keybind[opt][1]
+            self.d = self.keybind[opt][2]
+            self.r = self.keybind[opt][3]
+            self.title["text"] = "Snake - Use " + opt + " to control"
 
     def settings(self, event):
+        """changes all settings"""
         self.colorize(self.cs_var.get())
         self.rebind(self.kb_var.get())
 
