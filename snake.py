@@ -1,5 +1,7 @@
 import tkinter as t
 import random as r
+import time
+import threading as thr
 
 
 def main():
@@ -36,7 +38,11 @@ class Game:
 
         self.score = 0
         self.scr_lab = t.Label(upper_scr, text="Score: " + str(self.score))
-        self.scr_lab.pack()
+        self.scr_lab.pack(fill="x")
+
+        self.time_lab = t.Label(upper_scr, text="Time left: 0", state="disabled")
+        self.time_lab.pack(fill="x")
+        self.timed = False
 
         self.gamewin = t.Canvas(lower, height="350", width="350", bg="white", borderwidth="7", relief="ridge")
         self.gamewin.pack()
@@ -65,7 +71,7 @@ class Game:
 
         self.cs_var = t.StringVar(parent)
         self.cs_var.set("color scheme")
-        self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale", "sky")
+        self.colorset = t.OptionMenu(lower_set, self.cs_var, "color scheme", "normal", "neon blue", "neon yellow", "grayscale", "sky", "ocean")
         self.colorset["highlightthickness"] = 0
         self.colorset.pack(side="left")
 
@@ -73,7 +79,13 @@ class Game:
         self.kb_var.set("key bindings")
         self.ctrlset = t.OptionMenu(lower_set, self.kb_var, "key bindings", "wasd", "arrow keys", "ijkl")
         self.ctrlset["highlightthickness"] = 0
-        self.ctrlset.pack(side="right")
+        self.ctrlset.pack(side="left")
+
+        self.gm_var = t.StringVar(parent)
+        self.gm_var.set("game mode")
+        self.gameset = t.OptionMenu(lower_set, self.gm_var, "game mode", "normal", "timed")
+        self.gameset["highlightthickness"] = 0
+        self.gameset.pack(side="left")
 
         self.apply = t.Button(lower_set, text="Apply")
         self.apply.pack(side="right", fill="y")
@@ -83,9 +95,9 @@ class Game:
             "normal": ["SystemButtonFace", "white", "SystemButtonText", "SystemButtonFace", "blue", "red", "SystemWindowFrame", "SystemDisabledText"],
             "neon blue": ["black", "black", "deep sky blue", "gray15", "deep sky blue", "OrangeRed2", "deep sky blue", "white"],
             "neon yellow": ["black", "black", "yellow2", "gray15", "yellow2", "OrangeRed2", "yellow2", "white"],
-            "grayscale": ["gray50", "gray60", "black", "gray30", "dark slate gray", "black", "dark slate gray", "gray"],
+            "grayscale": ["gray50", "gray60", "black", "gray30", "dark slate gray", "black", "dark slate gray", "gray60"],
             "sky": ["sky blue", "light sky blue", "yellow", "gray85", "gold", "snow", "snow", "gray70"],
-            "ocean": []
+            "ocean": ["medium blue", "blue", "lawn green", "dodger blue", "dark orange", "salmon", "dodger blue", "dark green"]
         }
 
         self.keybind = {
@@ -134,6 +146,8 @@ class Game:
         self.status = True
         self.s_btn["state"] = "disabled"
         self.r_btn["state"] = "normal"
+        if self.timed:
+            self.timedgame()
 
     def retry(self, event):
         """resets the game"""
@@ -145,6 +159,8 @@ class Game:
             self.scatter()
             self.status = True
             self.gamewin.itemconfig(self.ded, state="hidden")
+            if self.timed:
+                self.timedgame()
 
     def colorize(self, opt):
         """changes game window color scheme"""
@@ -162,6 +178,9 @@ class Game:
             self.r_btn["disabledforeground"] = self.colorscheme[opt][7]
             self.scr_lab["bg"] = self.colorscheme[opt][0]
             self.scr_lab["foreground"] = self.colorscheme[opt][2]
+            self.time_lab["bg"] = self.colorscheme[opt][0]
+            self.time_lab["foreground"] = self.colorscheme[opt][2]
+            self.time_lab["disabledforeground"] = self.colorscheme[opt][7]
             self.colorset["bg"] = self.colorscheme[opt][3]
             self.colorset["activebackground"] = self.colorscheme[opt][3]
             self.colorset["fg"] = self.colorscheme[opt][2]
@@ -170,6 +189,10 @@ class Game:
             self.ctrlset["activebackground"] = self.colorscheme[opt][3]
             self.ctrlset["fg"] = self.colorscheme[opt][2]
             self.ctrlset["activeforeground"] = self.colorscheme[opt][2]
+            self.gameset["bg"] = self.colorscheme[opt][3]
+            self.gameset["activebackground"] = self.colorscheme[opt][3]
+            self.gameset["fg"] = self.colorscheme[opt][2]
+            self.gameset["activeforeground"] = self.colorscheme[opt][2]
             self.apply["bg"] = self.colorscheme[opt][3]
             self.apply["activebackground"] = self.colorscheme[opt][3]
             self.apply["foreground"] = self.colorscheme[opt][2]
@@ -188,10 +211,30 @@ class Game:
             self.r = self.keybind[opt][3]
             self.title["text"] = "Snake - Use " + opt + " to control"
 
+    def modeswap(self):
+        """changes the game mode"""
+        if not self.timed:
+            self.timed = True
+        else:
+            self.timed = False
+        self.time_lab["state"] = "normal"
+
+
     def settings(self, event):
         """changes all settings"""
         self.colorize(self.cs_var.get())
         self.rebind(self.kb_var.get())
+        self.modeswap()
+
+    def timedgame(self):
+        """executes a 30-second timed game of snake"""
+        tim = 30
+        while tim > 0:
+            time.sleep(1)
+            tim -= 1
+            self.time_lab["text"] = "Time left: " + str(tim)
+        self.gamewin.itemconfig(self.ded, state="normal")
+        self.status = False
 
 
 main()
